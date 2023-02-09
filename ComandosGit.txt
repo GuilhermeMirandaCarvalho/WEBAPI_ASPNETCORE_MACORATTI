@@ -1,0 +1,10 @@
+git init
+git status
+git add .
+git status
+git commit -m "Primeiro envio"
+git remote add origin https://github.com/GuilhermeMirandaCarvalho/WEBAPI_ASPNTCORE_MACORATTI.git
+git push origin master
+
+
+
