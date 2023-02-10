@@ -13,7 +13,7 @@ public class Produto
     public string? Nome { get; set; }
 
     [Required]
-    [StringLength(300)]
+    [StringLength(350)]
     public string? Descricao { get; set; }
 
     [Required]

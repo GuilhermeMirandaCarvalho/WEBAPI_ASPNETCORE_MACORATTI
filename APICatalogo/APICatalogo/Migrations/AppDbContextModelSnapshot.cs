@@ -54,8 +54,8 @@ namespace APICatalogo.Migrations
 
                     b.Property<string>("Descricao")
                         .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("varchar(300)");
+                        .HasMaxLength(350)
+                        .HasColumnType("varchar(350)");
 
                     b.Property<float>("Estoque")
                         .HasColumnType("float");
