@@ -21,13 +21,23 @@ namespace APICatalogo.Controllers
         [HttpGet("produtos")]
         public ActionResult<IEnumerable<Categoria>> GetCategoriasProdutos()
         {
-            return _context.Categorias.Include(p=> p.Produtos).ToList();
+            //return _context.Categorias.Include(p=> p.Produtos).AsNoTracking().ToList();
+            return _context.Categorias.Include(p => p.Produtos).Where(c=> c.CategoriaId <=5).ToList();
         }
 
         [HttpGet]
         public ActionResult<IEnumerable<Categoria>> Get()
         {
-            return _context.Categorias.ToList();
+            try
+            {
+                //throw new DataMisalignedException();
+                return _context.Categorias.AsNoTracking().ToList();
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,"Ocorreu um problema ao tratar sua solicitação");                
+            }
+            
         }
 
 
@@ -35,13 +45,20 @@ namespace APICatalogo.Controllers
         [HttpGet("{id:int}", Name = "Obter Categoria")]
         public ActionResult<Categoria> Get(int id)
         {
-            var categoria = _context.Categorias.FirstOrDefault(p => p.CategoriaId == id);
-            if (categoria is null)
+            try
             {
-                return NotFound("Categoria não encontrado");
+                var categoria = _context.Categorias.FirstOrDefault(p => p.CategoriaId == id);
+                if (categoria is null)
+                {
+                    return NotFound("Categoria não encontrado");
 
+                }
+                return Ok(categoria);
             }
-            return Ok(categoria);
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um problema ao tratar sua solicitação");
+            }
         }
 
         [HttpPost]
