@@ -21,5 +21,23 @@ namespace APICatalogo.Repository
             }
         }
 
+        public ICategoriaRepository CategoriaRepository
+        {
+            get
+            {
+                return _categoriaRepo = _categoriaRepo ?? new CategoriaRepository(_context);
+            }
+        }
+
+        public void Commit()
+        {
+            _context.SaveChanges();
+        }
+
+        public void Dispose()
+        {
+            _context.Dispose();
+        }
+
     }
 }

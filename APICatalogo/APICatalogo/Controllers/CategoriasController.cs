@@ -1,6 +1,6 @@
 ﻿using APICatalogo.Context;
 using APICatalogo.Models;
-using Microsoft.AspNetCore.Http;
+using APICatalogo.Repository;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,9 +10,9 @@ namespace APICatalogo.Controllers
     [ApiController]
     public class CategoriasController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly IUnitOfWork _context;
 
-        public CategoriasController(AppDbContext context)
+        public CategoriasController(IUnitOfWork context)
         {
             _context = context;
         }
@@ -22,38 +22,28 @@ namespace APICatalogo.Controllers
         public ActionResult<IEnumerable<Categoria>> GetCategoriasProdutos()
         {
             //return _context.Categorias.Include(p=> p.Produtos).AsNoTracking().ToList();
-            return _context.Categorias.Include(p => p.Produtos).Where(c=> c.CategoriaId <=5).ToList();
+            return _context.CategoriaRepository.GetCategoriasProdutos().ToList();
         }
 
         [HttpGet]
         public ActionResult<IEnumerable<Categoria>> Get()
         {
-            try
-            {
-                //throw new DataMisalignedException();
-                return _context.Categorias.AsNoTracking().ToList();
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,"Ocorreu um problema ao tratar sua solicitação");                
-            }
-            
+            //throw new DataMisalignedException();
+            return _context.CategoriaRepository.Get().ToList();
         }
 
-
-
-        [HttpGet("{id:int}", Name = "Obter Categoria")]
+        [HttpGet("{id}", Name = "Obter Categoria")]
         public ActionResult<Categoria> Get(int id)
         {
             try
             {
-                var categoria = _context.Categorias.FirstOrDefault(p => p.CategoriaId == id);
+                var categoria = _context.CategoriaRepository.GetById(p => p.CategoriaId == id);
                 if (categoria is null)
                 {
                     return NotFound("Categoria não encontrado");
 
                 }
-                return Ok(categoria);
+                return categoria;
             }
             catch (Exception)
             {
@@ -63,32 +53,26 @@ namespace APICatalogo.Controllers
 
         [HttpPost]
         public ActionResult Post(Categoria categoria)
-        {
-            if (categoria is null)
-            {
-                return BadRequest();
-            }
-
-            _context.Categorias.Add(categoria);
-            _context.SaveChanges();
+        {       
+            _context.CategoriaRepository.Add(categoria);
+            _context.Commit();
 
             return new CreatedAtRouteResult("Obter Categoria", new { id = categoria.CategoriaId }, categoria);
 
         }
 
         [HttpPut("{id:int}")]
-        public ActionResult Put(int id, Categoria categoria)
+        public ActionResult Put(int id, [FromBody] Categoria categoria)
         {
             if (id != categoria.CategoriaId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(categoria).State = EntityState.Modified;
-            _context.SaveChanges();
+            _context.CategoriaRepository.Update(categoria);
+            _context.Commit();
 
-            return Ok(categoria);
-
+            return Ok();
         }
 
 
