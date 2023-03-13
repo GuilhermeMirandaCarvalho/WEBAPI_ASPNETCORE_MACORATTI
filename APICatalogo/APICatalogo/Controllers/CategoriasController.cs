@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace APICatalogo.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class CategoriasController : ControllerBase
     {
@@ -52,7 +52,7 @@ namespace APICatalogo.Controllers
         }
 
         [HttpPost]
-        public ActionResult Post(Categoria categoria)
+        public ActionResult Post([FromBody] Categoria categoria)
         {       
             _context.CategoriaRepository.Add(categoria);
             _context.Commit();
@@ -72,7 +72,7 @@ namespace APICatalogo.Controllers
             _context.CategoriaRepository.Update(categoria);
             _context.Commit();
 
-            return Ok();
+            return Ok(categoria);
         }
 
 
@@ -80,15 +80,15 @@ namespace APICatalogo.Controllers
         [HttpDelete("{id:int}")]
         public ActionResult Delete(int id)
         {
-            var categoria = _context.Categorias.FirstOrDefault(p => p.CategoriaId == id);            
+            var categoria = _context.CategoriaRepository.GetById(p => p.CategoriaId == id);
 
             if (categoria is null)
             {
                 return NotFound("Categoria não localizado");
             }
 
-            _context.Categorias.Remove(categoria);
-            _context.SaveChanges();
+            _context.CategoriaRepository.Delete(categoria);
+            _context.Commit();
 
             return Ok(categoria);
         }
